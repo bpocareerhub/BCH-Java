@@ -1,26 +1,24 @@
 package com.bch.bom;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import com.mysql.jdbc.Connection;
 
 public class DBConnection {
-	private final String DBHOST = "localhost";
-	private final String DBUSER = "bch_hybrid";
-	private final String DBPASSWORD = "C@re3rHub101";
-	private final Integer DBPORT = 3306; 
-	private final String DBNAME = "bch_hybrid";
-	private final String DBDRIVER = "com.mysql.jdbc.Driver";
+	Properties prop = new Properties();
 	private Connection connection = null;
 	
 	public DBConnection() {
 		try {
-			Class.forName(this.DBDRIVER).newInstance();
+			prop.load(new FileInputStream("config.properties"));
+			Class.forName(prop.getProperty("dbdriver")).newInstance();
+			String url = "jdbc:mysql://" + prop.getProperty("dbhost") + ":" + prop.getProperty("dbport") + "/" + prop.getProperty("dbname");
 			
-			String url = "jdbc:mysql://" + this.DBHOST + ":" + this.DBPORT + "/" + this.DBNAME;
-			
-			this.connection = (Connection) DriverManager.getConnection(url, this.DBUSER, this.DBPASSWORD);
+			this.connection = (Connection) DriverManager.getConnection(url, prop.getProperty("dbuser"), prop.getProperty("dbpassword"));
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
@@ -28,6 +26,8 @@ public class DBConnection {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -39,27 +39,4 @@ public class DBConnection {
 	public void setConnection(Connection connection) {
 		this.connection = connection;
 	}
-
-	public String getDBHOST() {
-		return DBHOST;
-	}
-
-	public String getDBUSER() {
-		return DBUSER;
-	}
-
-	public String getDBPASSWORD() {
-		return DBPASSWORD;
-	}
-
-	public Integer getDBPORT() {
-		return DBPORT;
-	}
-
-	@Override
-	public String toString() {
-		return "DBConnection [DBHOST=" + DBHOST + ", DBUSER=" + DBUSER
-				+ ", DBPASSWORD=" + DBPASSWORD + ", DBPORT=" + DBPORT
-				+ ", connection=" + connection + "]";
-	}	
 }

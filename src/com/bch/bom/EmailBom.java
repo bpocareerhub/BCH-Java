@@ -1,5 +1,7 @@
 package com.bch.bom;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 import javax.mail.Message;
@@ -19,22 +21,33 @@ import com.bch.beans.Users;
 public class EmailBom {
 	private String toEmail;
 	private String subject = null;
-	private String host = "localhost";
+	private String host = null;
 	private String body = null;
 	private String hashLink = null;	
-	private String url = "http://www.bpocareerhub.com";
-	private final String from = "BPO Career Hub <info@bpocareerhub.com>";
+	private String url = null;
+	private String from = null;
 	private String partnersLink;
+	private String stmp = null;
 	Properties properties = System.getProperties();
+	Properties prop = new Properties();
 	static final Logger logger = Logger.getLogger(EmailBom.class);
 		
 	
 	public EmailBom(Users user) {
 		super();
+		try {
+			prop.load(new FileInputStream("config.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		this.toEmail = user.getEmail();		
-		this.subject = "BPOCareerHub bringing better career opportunities to AMA peeps!";
 		this.hashLink = user.getHash();
 		this.partnersLink = user.getBranch();
+		this.subject = prop.getProperty("subject");
+		this.host = prop.getProperty("host");
+		this.url = prop.getProperty("url");
+		this.from = prop.getProperty("from");
+		this.stmp = prop.getProperty("smtp");
 		PropertyConfigurator.configure("log4j.properties");
 	}
 	
@@ -42,7 +55,7 @@ public class EmailBom {
 	public boolean sendMail() {
 		boolean success = false;
 
-		properties.setProperty("mail.stmp.host",this.host);
+		properties.setProperty(this.stmp,this.host);
 		
 		Session session = Session.getDefaultInstance(properties);
 		MimeMessage message = new MimeMessage(session);
